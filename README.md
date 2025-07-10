@@ -10,17 +10,18 @@ This project uses Vite + React + TypeScript with integrated ESLint and Prettier.
 
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
-- `npm run lint` - Run ESLint (includes Prettier formatting checks)
-- `npm run fix` - Auto-fix ESLint and Prettier issues
+- `npm run lint` - Run ESLint + Stylelint (includes Prettier formatting checks)
+- `npm run lint:fix` - Auto-fix ESLint + Stylelint and Prettier issues
 - `npm run test` - Run tests in watch mode
 - `npm run test:run` - Run tests once
 - `npm run check` - Run both linting and formatting checks
 
 ### Code Quality
 
-ESLint is configured with Prettier integration and TypeScript type-aware rules:
+ESLint is configured with Prettier integration, Stylelint for CSS, and TypeScript type-aware rules:
 
 - **Type-aware linting**: Catches TypeScript-specific issues and type errors
+- **CSS linting**: Stylelint catches CSS syntax errors and enforces best practices
 - **Prettier integration**: Formatting rules are enforced as ESLint errors
 - **Git hooks**: Pre-commit runs linting, pre-push runs tests
 - **Auto-fix**: `npm run lint:fix` fixes both linting and formatting issues
