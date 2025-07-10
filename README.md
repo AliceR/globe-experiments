@@ -2,9 +2,16 @@
 
 🌍 Interactive 3D geospatial dashboard with dynamic data visualization.
 
+## Features
+
+- **Interactive 3D Scene**: Mouse controls for rotation, zoom, and pan
+- **Real-time Controls**: Leva panel for adjusting scene parameters
+- **Performance Monitoring**: Built-in stats display
+- **Responsive Design**: Full-screen 3D canvas with overlay UI
+
 ## Development Setup
 
-This project uses Vite + React + TypeScript with integrated ESLint and Prettier.
+This project uses Vite + React + TypeScript with Three.js for 3D visualization.
 
 ### Available Scripts
 
@@ -23,13 +30,15 @@ ESLint is configured with Prettier integration, Stylelint for CSS, and TypeScrip
 - **Type-aware linting**: Catches TypeScript-specific issues and type errors
 - **CSS linting**: Stylelint catches CSS syntax errors and enforces best practices
 - **Prettier integration**: Formatting rules are enforced as ESLint errors
-- **Git hooks**: Pre-commit runs linting, pre-push runs tests
+- **Git hooks**: Pre-commit runs linting (`npm run lint`), pre-push runs tests (`npm run test:run`)
 - **Auto-fix**: `npm run lint:fix` fixes both linting and formatting issues
 
-### Git Hooks
+### 3D Libraries
 
-- **Pre-commit**: Runs `npm run lint` to catch code quality issues
-- **Pre-push**: Runs `npm run test:run` to ensure tests pass
+- **Three.js**: Core 3D graphics library
+- **@react-three/fiber**: React renderer for Three.js
+- **@react-three/drei**: Helper components and utilities
+- **Leva**: Real-time controls for development and debugging
 
 ---
 

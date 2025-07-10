@@ -24,10 +24,8 @@ body {
   /* 5. Improve text rendering */
   -webkit-font-smoothing: antialiased;
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
-  min-height: 100vh;
+  height: 100vh;
 }
 
 /* 6. Improve media defaults */
@@ -60,6 +58,7 @@ h1, h2, h3, h4, h5, h6 {
 */
 #root, #__next {
   isolation: isolate;
+  height: 100%;
 }
 
 /*****************************************************************************  */

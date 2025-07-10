@@ -1,37 +1,62 @@
-import { describe, it, expect } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import type { ReactNode } from 'react';
 import App from './App';
 
+// Mock Three.js and React Three Fiber
+vi.mock('@react-three/fiber', () => ({
+  Canvas: ({ children, ...props }: { children: ReactNode }) => (
+    <div data-testid='canvas' {...props}>
+      {children}
+    </div>
+  )
+}));
+
+vi.mock('@react-three/drei', () => ({
+  OrbitControls: () => <div data-testid='orbit-controls' />,
+  Stats: () => <div data-testid='stats' />
+}));
+
+vi.mock('leva', () => ({
+  useControls: () => ({
+    rotationSpeed: 0.01,
+    wireframe: false
+  })
+}));
+
 describe('App', () => {
-  it('renders Vite + React heading', () => {
+  it('renders Earth Information Explorer heading', () => {
     render(<App />);
-    const heading = screen.getByRole('heading', { name: /vite \+ react/i });
+    const heading = screen.getByRole('heading', {
+      name: /earth information explorer/i
+    });
     expect(heading).toBeInTheDocument();
   });
 
-  it('renders count button with initial value', () => {
+  it('renders dashboard description', () => {
     render(<App />);
-    const button = screen.getByRole('button', { name: /count is 0/i });
-    expect(button).toBeInTheDocument();
+    const description = screen.getByText(
+      /interactive 3d geospatial dashboard/i
+    );
+    expect(description).toBeInTheDocument();
   });
 
-  it('increments count when button is clicked', () => {
+  it('renders canvas container', () => {
     render(<App />);
-    const button = screen.getByRole('button', { name: /count is 0/i });
-
-    fireEvent.click(button);
-
-    expect(
-      screen.getByRole('button', { name: /count is 1/i })
-    ).toBeInTheDocument();
+    const main = screen.getByRole('main');
+    expect(main).toBeInTheDocument();
+    expect(main).toHaveClass('main');
   });
 
-  it('renders both logos', () => {
+  it('renders 3D canvas', () => {
     render(<App />);
-    const viteLogo = screen.getByAltText('Vite logo');
-    const reactLogo = screen.getByAltText('React logo');
+    const canvas = screen.getByTestId('canvas');
+    expect(canvas).toBeInTheDocument();
+  });
 
-    expect(viteLogo).toBeInTheDocument();
-    expect(reactLogo).toBeInTheDocument();
+  it('renders with proper app structure', () => {
+    render(<App />);
+    const app = document.querySelector('.app');
+    expect(app).toBeInTheDocument();
   });
 });

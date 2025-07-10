@@ -1,45 +1,49 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+.app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+  color: white;
+  font-family: system-ui, -apple-system, sans-serif;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 1rem 2rem;
+  background: rgb(0 0 0 / 80%);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgb(255 255 255 / 10%);
 }
 
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+.header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  background: linear-gradient(45deg, #64b5f6, #42a5f5);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.header p {
+  margin: 0.25rem 0 0;
+  font-size: 0.9rem;
+  color: rgb(255 255 255 / 70%);
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
+.main {
+  flex: 1; /* Takes remaining space automatically */
+  position: relative;
+  min-height: 0; /* Important for flex children to shrink properly */
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
+/* Canvas container */
+.main canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  outline: none;
 }
