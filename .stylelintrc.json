@@ -8,5 +8,13 @@
     "no-duplicate-selectors": true,
     "block-no-empty": true,
     "selector-id-pattern": null
+  },
+  "overrides": [
+  {
+    "files": ["index.css"],
+    "rules": {
+      "import-notation": null
+    }
   }
+]
 }
