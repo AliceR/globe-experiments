@@ -2,6 +2,7 @@ import { useRef, useState, useCallback } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import type { ThreeEvent } from '@react-three/fiber';
 import * as THREE from 'three';
+import { GlobeContext } from './contexts/GlobeContext';
 
 /** Auto-rotation speed in radians per second when not being dragged */
 const AUTO_ROTATION_SPEED = 0.005;
@@ -211,7 +212,9 @@ function GlobeWrapper({
 
   return (
     <group ref={ref}>
-      {children}
+      <GlobeContext.Provider value={{ globeGroup: ref.current }}>
+        {children}
+      </GlobeContext.Provider>
 
       {/* Invisible sphere overlay for pointer events */}
       <mesh
