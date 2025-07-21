@@ -108,14 +108,16 @@ export function getAllTiles(
 /**
  * Constructs a tile URL for a web mercator tile service
  */
-export function getTileUrl(
-  x: number,
-  y: number,
-  z: number,
-  format: string = 'png'
-): string {
-  const baseUrl = 'https://tile.openstreetmap.org';
-  return `${baseUrl}/${z}/${x}/${y}.${format}`;
+export function getTileUrl(x: number, y: number, z: number): string {
+  // const baseUrl = 'https://tile.openstreetmap.org';
+  // return `${baseUrl}/${z}/${x}/${y}.png`;
+
+  const baseUrl =
+    'https://openveda.cloud/api/raster/searches/ef5766e5684b02f6bf65185f542354f3/tiles/WebMercatorQuad';
+
+  const params = `title=VEDA+Dashboard+Render+Parameters&rescale=0.000408%2C0.000419&colormap_name=rdylbu_r&reScale=NaN%2CNaN&assets=cog_default`;
+
+  return `${baseUrl}/${z}/${x}/${y}?${params}`;
 
   // Satellite imagery option (requires API key):
   // const mapboxUrl = `https://api.mapbox.com/v4/mapbox.satellite/${z}/${x}/${y}@2x.jpg90?access_token=YOUR_TOKEN`;

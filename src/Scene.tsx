@@ -24,7 +24,7 @@ function Scene() {
 
         {/* Tile layer */}
         <TileLayer
-          zoom={4}
+          zoom={3}
           opacity={0.8}
           radius={EARTH_RADIUS + 0.001} // Slightly above the globe surface
         />
