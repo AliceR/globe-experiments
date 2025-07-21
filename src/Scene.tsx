@@ -2,6 +2,7 @@ import { OrbitControls, Stats } from '@react-three/drei';
 
 import Earth from './Earth';
 import GlobeWrapper, { DEFAULT_GLOBE_RADIUS } from './GlobeWrapper';
+import { TileLayer } from './TileLayer';
 import { markers } from './data/markers';
 import { Marker } from './Marker';
 
@@ -17,9 +18,18 @@ function Scene() {
       {/* Directional light for shadows and depth */}
       <directionalLight position={[-10, 10, 15]} intensity={5} />
 
-      {/* Earth mesh */}
-      <GlobeWrapper radius={EARTH_RADIUS}>
+      <GlobeWrapper radius={EARTH_RADIUS} debug={true}>
+        {/* Earth mesh */}
         <Earth radius={EARTH_RADIUS} />
+
+        {/* Tile layer */}
+        <TileLayer
+          zoom={4}
+          opacity={0.8}
+          radius={EARTH_RADIUS + 0.001} // Slightly above the globe surface
+        />
+
+        {/* Markers for major cities */}
         {markers.map((m) => (
           <Marker key={m.id} {...m} />
         ))}
