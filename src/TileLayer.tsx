@@ -136,7 +136,18 @@ export function TileLayer({
   radius = 1.01
 }: TileLayerProps) {
   // Generate all tiles for the given zoom level
-  const tiles = useMemo(() => getAllTiles(zoom), [zoom]);
+  const tiles = useMemo(() => {
+    const MAX_ZOOM = 4; // Maximum zoom level for tiles
+
+    let clampedZoom = zoom;
+    if (zoom < 0 || zoom > MAX_ZOOM) {
+      clampedZoom = Math.min(Math.max(zoom, 0), MAX_ZOOM);
+      console.warn(
+        `Zoom level ${zoom} is out of bounds (0-${MAX_ZOOM}). Clamping zoom level ${zoom} to ${clampedZoom}.`
+      );
+    }
+    return getAllTiles(clampedZoom);
+  }, [zoom]);
 
   // Memoize the tile layer based on zoom
   const tileElements = useMemo(() => {
