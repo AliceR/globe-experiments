@@ -25,6 +25,24 @@ function getTileCount(zoom: number): { cols: number; rows: number } {
 }
 
 /**
+ * Clamp zoom level to a reasonable range
+ * This prevents excessive zooming that could lead to performance issues
+ *
+ * @param zoom - Zoom level to clamp
+ * @returns Clamped zoom level between 0 and MAX_ZOOM
+ */
+export function clamp(zoom: number): number {
+  const MAX_ZOOM = 4;
+  const clampedZoom = Math.min(Math.max(zoom, 0), MAX_ZOOM);
+  if (zoom < 0 || zoom > MAX_ZOOM) {
+    console.warn(
+      `Zoom level ${zoom} is out of bounds (0-${MAX_ZOOM}). Clamping zoom level ${zoom} to ${clampedZoom}.`
+    );
+  }
+  return clampedZoom;
+}
+
+/**
  * Converts Web Mercator Y coordinate to latitude
  * Based on: https://en.wikipedia.org/wiki/Web_Mercator_projection
  *
@@ -36,6 +54,34 @@ function webMercatorYToLat(y: number, z: number): number {
   const n = Math.PI - (2 * Math.PI * y) / Math.pow(2, z);
   const lat = (180 / Math.PI) * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)));
   return lat;
+}
+
+/**
+ * Convert pixel coordinates to latitude and longitude.
+ * @param x - The x coordinate of the pixel.
+ * @param y - The y coordinate of the pixel.
+ * @param tileX - The x coordinate of the tile.
+ * @param tileY - The y coordinate of the tile.
+ * @param width - The width of the tile.
+ * @param height - The height of the tile.
+ * @param nTiles - The number of tiles in the x and y directions.
+ * @returns The latitude and longitude corresponding to the pixel coordinates.
+ */
+export function pixelToLatLon(
+  x: number,
+  y: number,
+  tileX: number,
+  tileY: number,
+  width: number,
+  height: number,
+  nTiles: number
+) {
+  const px = tileX + x / width;
+  const py = tileY + y / height;
+  const lon = (px / nTiles) * 360 - 180;
+  const lat =
+    Math.atan(Math.sinh(Math.PI * (1 - 2 * (py / nTiles)))) * (180 / Math.PI);
+  return [lat, lon];
 }
 
 /**

@@ -1,8 +1,10 @@
 import { OrbitControls, Stats } from '@react-three/drei';
 
-import Earth from './Earth';
 import GlobeWrapper, { DEFAULT_GLOBE_RADIUS } from './GlobeWrapper';
-import { TileLayer } from './TileLayer';
+import Earth from './Earth';
+// import { TileLayer } from './TileLayer';
+import { TilePointCloud } from './TilePointCloud';
+// import { VideoGlobe } from './VideoGlobe';
 import { markers } from './data/markers';
 import { Marker } from './Marker';
 
@@ -23,11 +25,19 @@ function Scene() {
         <Earth radius={EARTH_RADIUS} />
 
         {/* Tile layer */}
-        <TileLayer
+        {/* <TileLayer
           zoom={3}
           opacity={0.8}
           radius={EARTH_RADIUS + 0.001} // Slightly above the globe surface
+        /> */}
+
+        {/* Point cloud visualization of tiles */}
+        <TilePointCloud
+          zoom={2}
+          radius={EARTH_RADIUS + 0.001} // Slightly above the globe surface
         />
+
+        {/* <VideoGlobe radius={EARTH_RADIUS} /> */}
 
         {/* Markers for major cities */}
         {markers.map((m) => (

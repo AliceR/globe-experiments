@@ -2,6 +2,7 @@ import { useMemo, useState, useEffect } from 'react';
 import * as THREE from 'three';
 
 import {
+  clamp,
   getAllTiles,
   getTileBounds,
   getTileUrl,
@@ -135,19 +136,10 @@ export function TileLayer({
   opacity = 1,
   radius = 1.01
 }: TileLayerProps) {
+  // Clamp zoom to valid range
+  const clampedZoom = clamp(zoom);
   // Generate all tiles for the given zoom level
-  const tiles = useMemo(() => {
-    const MAX_ZOOM = 4; // Maximum zoom level for tiles
-
-    let clampedZoom = zoom;
-    if (zoom < 0 || zoom > MAX_ZOOM) {
-      clampedZoom = Math.min(Math.max(zoom, 0), MAX_ZOOM);
-      console.warn(
-        `Zoom level ${zoom} is out of bounds (0-${MAX_ZOOM}). Clamping zoom level ${zoom} to ${clampedZoom}.`
-      );
-    }
-    return getAllTiles(clampedZoom);
-  }, [zoom]);
+  const tiles = useMemo(() => getAllTiles(clampedZoom), [clampedZoom]);
 
   // Memoize the tile layer based on zoom
   const tileElements = useMemo(() => {
