@@ -5,7 +5,7 @@ import { useMarkerVisibility } from './hooks/useMarkerVisibility';
 import { DEFAULT_GLOBE_RADIUS } from './GlobeWrapper';
 
 export function Marker({ lat, lon }: { lat: number; lon: number }) {
-  const pos = latLonToVector3(lat, lon);
+  const pos = latLonToVector3(lat, lon, 1);
   const { globeGroup } = useContext(GlobeContext);
   const { isVisible } = useMarkerVisibility(
     lat,

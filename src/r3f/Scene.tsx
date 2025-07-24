@@ -2,10 +2,10 @@ import { OrbitControls, Stats } from '@react-three/drei';
 
 import GlobeWrapper, { DEFAULT_GLOBE_RADIUS } from './GlobeWrapper';
 import Earth from './Earth';
-// import { TileLayer } from './TileLayer';
+import { TileLayer } from './TileLayer';
 import { TilePointCloud } from './TilePointCloud';
-// import { VideoGlobe } from './VideoGlobe';
-import { markers } from './data/markers';
+import VideoGlobe from './VideoGlobe';
+import { markers } from '../data/markers';
 import { Marker } from './Marker';
 
 // Both the Earth and its wrapper use the same radius value for accurate alignment between cursor interaction and globe surface
@@ -25,11 +25,11 @@ function Scene() {
         <Earth radius={EARTH_RADIUS} />
 
         {/* Tile layer */}
-        {/* <TileLayer
+        <TileLayer
           zoom={3}
           opacity={0.8}
           radius={EARTH_RADIUS + 0.001} // Slightly above the globe surface
-        /> */}
+        />
 
         {/* Point cloud visualization of tiles */}
         <TilePointCloud
@@ -37,7 +37,7 @@ function Scene() {
           radius={EARTH_RADIUS + 0.001} // Slightly above the globe surface
         />
 
-        {/* <VideoGlobe radius={EARTH_RADIUS} /> */}
+        <VideoGlobe radius={EARTH_RADIUS} />
 
         {/* Markers for major cities */}
         {markers.map((m) => (

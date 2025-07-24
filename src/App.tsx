@@ -1,5 +1,4 @@
-import { Canvas } from '@react-three/fiber';
-import Scene from './Scene';
+import R3FGlobe from './r3f';
 
 function App() {
   return (
@@ -13,9 +12,7 @@ function App() {
         </p>
       </header>
       <main className='relative min-h-0 flex-1'>
-        <Canvas camera={{ position: [0, 0, 3], fov: 60 }}>
-          <Scene />
-        </Canvas>
+        <R3FGlobe />
       </main>
     </div>
   );
