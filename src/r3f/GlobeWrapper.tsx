@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback, useEffect } from 'react';
+import { useRef, useState, useCallback, useContext, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import type { ThreeEvent } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -61,7 +61,7 @@ interface GlobeWrapperProps {
  */
 function GlobeWrapper({
   children,
-  autoRotationSpeed: initialAutoRotationSpeed = AUTO_ROTATION_SPEED,
+  autoRotationSpeed = AUTO_ROTATION_SPEED,
   radius = DEFAULT_GLOBE_RADIUS,
   debug = false
 }: GlobeWrapperProps) {
@@ -71,23 +71,33 @@ function GlobeWrapper({
   /** Three.js rendering context with camera, raycaster, and pointer */
   const { camera, raycaster, pointer } = useThree();
 
-  /** Flag indicating whether the user is currently dragging the globe */
-  const [isDragging, setIsDragging] = useState(false);
+  /** Globe rotation state from context */
+  const { rotationState, setRotationState, setGlobeGroup } =
+    useContext(GlobeContext);
 
   /** The surface point (in local normalized coordinates) where the user grabbed the globe */
   const [grabbedPoint, setGrabbedPoint] = useState<THREE.Vector3 | null>(null);
 
-  /** Current auto-rotation speed (0 when dragging, initialAutoRotationSpeed when not) */
-  const [autoRotationSpeed, setAutoRotationSpeed] = useState(
-    initialAutoRotationSpeed
-  );
-  useEffect(() => {
-    setAutoRotationSpeed(initialAutoRotationSpeed);
-  }, [initialAutoRotationSpeed]);
-
   /** Initial quaternion state when drag began, used for relative rotation calculations */
   const [initialQuaternion, setInitialQuaternion] =
     useState<THREE.Quaternion | null>(null);
+
+  /** Update the globe group in context when ref changes */
+  useEffect(() => {
+    setGlobeGroup(ref.current);
+  }, [setGlobeGroup]);
+
+  /** Handle auto-rotation resumption after dragging ends */
+  useEffect(() => {
+    if (rotationState === 'paused' && !grabbedPoint && !initialQuaternion) {
+      // Resume rotation after a short delay
+      const timer = setTimeout(() => {
+        setRotationState('rotating');
+      }, 500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [rotationState, grabbedPoint, initialQuaternion, setRotationState]);
 
   /**
    * Auto-rotation animation loop that continuously rotates the globe around its polar axis.
@@ -97,7 +107,7 @@ function GlobeWrapper({
    * @param delta - Time elapsed since last frame in seconds
    */
   useFrame((_state, delta) => {
-    if (ref.current && !isDragging) {
+    if (ref.current && rotationState === 'rotating') {
       // Rotate around the Earth's own polar axis (local Y-axis)
       const earthPolarAxis = new THREE.Vector3(0, 1, 0);
       const rotationAmount = autoRotationSpeed * delta * 60;
@@ -122,14 +132,19 @@ function GlobeWrapper({
    */
   const handlePointerDown = useCallback(
     (event: ThreeEvent<PointerEvent>) => {
-      event.stopPropagation();
-
       // Check if pointer is over the globe by raycasting to the group
       raycaster.setFromCamera(pointer, camera);
       const intersects = raycaster.intersectObject(ref.current!, true);
 
+      // If we hit a marker, let it handle the event
       if (intersects.length > 0) {
-        setIsDragging(true);
+        const hitObject = intersects[0].object;
+        if (hitObject.userData?.isMarker) {
+          // This is a marker, don't start dragging
+          return;
+        }
+
+        event.stopPropagation();
 
         // Store the initial quaternion for relative rotation
         setInitialQuaternion(ref.current!.quaternion.clone());
@@ -141,20 +156,24 @@ function GlobeWrapper({
 
         // Store the grabbed point
         setGrabbedPoint(normalizedPoint);
-        setAutoRotationSpeed(0); // Stop auto rotation while dragging
+
+        // Only pause if not manually stopped
+        if (rotationState !== 'stopped') {
+          setRotationState('paused');
+        }
       }
     },
-    [camera, raycaster, pointer]
+    [camera, raycaster, pointer, rotationState, setRotationState]
   );
 
   /**
    * Handles pointer move events during globe dragging.
-   * Calculates the rotation needed to keep the grabbed surface point under the cursor
-   * by using raycasting against a virtual sphere and quaternion mathematics.
+   * Calculates the rotation needed to keep the grabbed surface point under the
+   * cursor by using raycasting against a virtual sphere and quaternion
+   * mathematics.
    */
   const handlePointerMove = useCallback(() => {
-    if (!isDragging || !ref.current || !grabbedPoint || !initialQuaternion)
-      return;
+    if (!ref.current || !grabbedPoint || !initialQuaternion) return;
 
     // Cast ray from current mouse position to determine target location
     raycaster.setFromCamera(pointer, camera);
@@ -196,33 +215,20 @@ function GlobeWrapper({
         ref.current.setRotationFromQuaternion(newQuaternion);
       }
     }
-  }, [
-    isDragging,
-    grabbedPoint,
-    initialQuaternion,
-    camera,
-    raycaster,
-    pointer,
-    radius
-  ]);
+  }, [grabbedPoint, initialQuaternion, camera, raycaster, pointer, radius]);
 
   /**
    * Handles pointer up events to end globe dragging.
-   * Cleans up drag state and resumes auto-rotation after a short delay.
+   * Cleans up drag state. Auto-rotation resumption is handled by useEffect.
    */
   const handlePointerUp = useCallback(() => {
-    setIsDragging(false);
     setGrabbedPoint(null); // Clean up stored point on drag end
     setInitialQuaternion(null); // Clean up initial quaternion
-    // Resume auto rotation after a short delay
-    setTimeout(() => setAutoRotationSpeed(initialAutoRotationSpeed), 1000);
-  }, [initialAutoRotationSpeed]);
+  }, []);
 
   return (
     <group ref={ref}>
-      <GlobeContext.Provider value={{ globeGroup: ref.current }}>
-        {children}
-      </GlobeContext.Provider>
+      {children}
 
       {/* Invisible sphere overlay for pointer events */}
       <mesh
