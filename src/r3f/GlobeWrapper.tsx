@@ -16,6 +16,8 @@ export const DEFAULT_GLOBE_RADIUS = 1;
 interface GlobeWrapperProps {
   /** Child components to render inside the globe wrapper (typically Earth mesh) */
   children?: React.ReactNode;
+  /** Speed of auto-rotation when not being dragged (default: AUTO_ROTATION_SPEED) */
+  autoRotationSpeed?: number;
   /** Radius of the globe sphere for interaction calculations */
   radius?: number;
   /** Enable debug axis helpers for development/testing */
@@ -53,11 +55,13 @@ interface GlobeWrapperProps {
  *
  * @param props - Configuration props for the globe wrapper
  * @param props.children - Child components to render inside the wrapper
+ * @param props.autoRotationSpeed - Speed of auto-rotation when not being dragged (default: AUTO_ROTATION_SPEED)
  * @param props.radius - Globe radius for interaction calculations (default: 1)
  * @returns JSX element containing the interactive globe wrapper
  */
 function GlobeWrapper({
   children,
+  autoRotationSpeed: initialAutoRotationSpeed = AUTO_ROTATION_SPEED,
   radius = DEFAULT_GLOBE_RADIUS,
   debug = false
 }: GlobeWrapperProps) {
@@ -73,9 +77,10 @@ function GlobeWrapper({
   /** The surface point (in local normalized coordinates) where the user grabbed the globe */
   const [grabbedPoint, setGrabbedPoint] = useState<THREE.Vector3 | null>(null);
 
-  /** Current auto-rotation speed (0 when dragging, AUTO_ROTATION_SPEED when not) */
-  const [autoRotationSpeed, setAutoRotationSpeed] =
-    useState(AUTO_ROTATION_SPEED);
+  /** Current auto-rotation speed (0 when dragging, initialAutoRotationSpeed when not) */
+  const [autoRotationSpeed, setAutoRotationSpeed] = useState(
+    initialAutoRotationSpeed
+  );
 
   /** Initial quaternion state when drag began, used for relative rotation calculations */
   const [initialQuaternion, setInitialQuaternion] =
@@ -207,8 +212,8 @@ function GlobeWrapper({
     setGrabbedPoint(null); // Clean up stored point on drag end
     setInitialQuaternion(null); // Clean up initial quaternion
     // Resume auto rotation after a short delay
-    setTimeout(() => setAutoRotationSpeed(AUTO_ROTATION_SPEED), 1000);
-  }, []);
+    setTimeout(() => setAutoRotationSpeed(initialAutoRotationSpeed), 1000);
+  }, [initialAutoRotationSpeed]);
 
   return (
     <group ref={ref}>

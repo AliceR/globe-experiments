@@ -20,7 +20,11 @@ function Scene() {
       {/* Directional light for shadows and depth */}
       <directionalLight position={[-10, 10, 15]} intensity={5} />
 
-      <GlobeWrapper radius={EARTH_RADIUS} debug={true}>
+      <GlobeWrapper
+        autoRotationSpeed={0} // 0 = auto-rotation off
+        radius={EARTH_RADIUS}
+        debug={true}
+      >
         {/* Earth mesh */}
         <Earth radius={EARTH_RADIUS} />
 
