@@ -1,6 +1,7 @@
 import { useThree } from '@react-three/fiber';
 import { useEffect, useState } from 'react';
 import * as THREE from 'three';
+import { DEFAULT_GLOBE_RADIUS } from '../Scene';
 
 /**
  * Hook to determine if a marker should be visible based on its position relative to the camera.
@@ -10,21 +11,24 @@ import * as THREE from 'three';
  * @param lon - Longitude of the marker
  * @param globeGroup - The globe's group object for applying rotation
  * @param globeRadius - Radius of the globe (default: 1)
- * @param markerRadius - Radius at which marker is positioned (default: 1.01)
+ * @param markerOffset - Offset above the globe surface for marker positioning (default: 0.01)
  * @returns Object containing visibility state and opacity for smooth transitions
  */
 export function useMarkerVisibility(
   lat: number,
   lon: number,
   globeGroup: THREE.Group | null,
-  globeRadius: number = 1,
-  markerRadius: number = 1.01
+  globeRadius: number = DEFAULT_GLOBE_RADIUS,
+  markerOffset: number = 0.01
 ) {
   const { camera } = useThree();
   const [visibility, setVisibility] = useState({ isVisible: true, opacity: 1 });
 
   useEffect(() => {
     const updateVisibility = () => {
+      // Calculate marker radius as globe radius + offset
+      const markerRadius = globeRadius + markerOffset;
+
       // Convert lat/lon to 3D position (same as latLonToVector3)
       const phi = (90 - lat) * (Math.PI / 180);
       const theta = (lon + 180) * (Math.PI / 180);
@@ -78,7 +82,6 @@ export function useMarkerVisibility(
         cancelAnimationFrame(animationId);
       }
     };
-  }, [lat, lon, globeGroup, globeRadius, markerRadius, camera]);
-
+  }, [lat, lon, globeGroup, globeRadius, markerOffset, camera]);
   return visibility;
 }

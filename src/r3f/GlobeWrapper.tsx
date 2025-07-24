@@ -3,12 +3,10 @@ import { useFrame, useThree } from '@react-three/fiber';
 import type { ThreeEvent } from '@react-three/fiber';
 import * as THREE from 'three';
 import { GlobeContext } from './contexts/GlobeContext';
+import { DEFAULT_GLOBE_RADIUS } from './Scene';
 
 /** Auto-rotation speed in radians per second when not being dragged */
 const AUTO_ROTATION_SPEED = 0.005;
-
-/** Default radius for the globe sphere geometry */
-export const DEFAULT_GLOBE_RADIUS = 1;
 
 /**
  * Props for the GlobeWrapper component

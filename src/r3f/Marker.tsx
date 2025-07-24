@@ -6,21 +6,29 @@ import { useMarkerVisibility } from './hooks/useMarkerVisibility';
 import { focusGlobeOnLatLon } from './utils/focusGlobeOnLatLon';
 import { latLonToVector3 } from './utils/geo';
 
-import { DEFAULT_GLOBE_RADIUS } from './GlobeWrapper';
-
-export function Marker({ lat, lon }: { lat: number; lon: number }) {
-  const pos = latLonToVector3(lat, lon, 1);
+export function Marker({
+  lat,
+  lon,
+  globeRadius
+}: {
+  lat: number;
+  lon: number;
+  globeRadius: number;
+}) {
+  const MARKER_OFFSET = 0.01; // Offset above the globe surface
+  const pos = latLonToVector3(lat, lon, globeRadius + MARKER_OFFSET);
   const { globeGroup, rotationState, setRotationState } =
     useContext(GlobeContext);
   const { camera } = useThree();
   const [isHovered, setIsHovered] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const { isVisible } = useMarkerVisibility(
     lat,
     lon,
     globeGroup,
-    DEFAULT_GLOBE_RADIUS,
-    1.01
+    globeRadius,
+    MARKER_OFFSET
   );
 
   // Cleanup timeout on unmount

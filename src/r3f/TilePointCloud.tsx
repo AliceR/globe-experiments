@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import * as THREE from 'three';
 import { latLonToVector3 } from './utils/geo';
 import { clamp, getAllTiles, getTileUrl, pixelToLatLon } from './utils/tiles';
+import { DEFAULT_GLOBE_RADIUS } from './Scene';
 
 type TilePointCloudProps = {
   zoom?: number;
@@ -23,7 +24,7 @@ type TilePointCloudProps = {
  */
 export const TilePointCloud: React.FC<TilePointCloudProps> = ({
   zoom = 1,
-  radius = 1,
+  radius = DEFAULT_GLOBE_RADIUS + 0.01,
   pointSize = 1,
   lodStep = 1
 }) => {

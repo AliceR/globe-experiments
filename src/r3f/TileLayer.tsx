@@ -9,6 +9,7 @@ import {
   tileUVToLatLon
 } from './utils/tiles';
 import { latLonToVector3 } from './utils/geo';
+import { DEFAULT_GLOBE_RADIUS } from './Scene';
 
 /**
  * Props for the TileLayer component
@@ -56,7 +57,7 @@ function Tile({
   y,
   z,
   opacity = 1,
-  radius = 1.01
+  radius = DEFAULT_GLOBE_RADIUS + 0.01
 }: {
   x: number;
   y: number;
@@ -134,7 +135,7 @@ function Tile({
 export function TileLayer({
   zoom,
   opacity = 1,
-  radius = 1.01
+  radius = DEFAULT_GLOBE_RADIUS + 0.01
 }: TileLayerProps) {
   // Clamp zoom to valid range
   const clampedZoom = clamp(zoom);

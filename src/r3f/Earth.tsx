@@ -1,5 +1,5 @@
 import { useTexture } from '@react-three/drei';
-import { DEFAULT_GLOBE_RADIUS } from './GlobeWrapper';
+import { DEFAULT_GLOBE_RADIUS } from './Scene';
 
 function Earth({ radius = DEFAULT_GLOBE_RADIUS }: { radius?: number }) {
   const [colorMap, bumpMap] = useTexture([

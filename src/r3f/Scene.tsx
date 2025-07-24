@@ -1,16 +1,19 @@
 import { OrbitControls, Stats } from '@react-three/drei';
 import { useControls } from 'leva';
 
-import GlobeWrapper, { DEFAULT_GLOBE_RADIUS } from './GlobeWrapper';
+import GlobeWrapper from './GlobeWrapper';
 import Earth from './Earth';
-import { TileLayer } from './TileLayer';
-import { TilePointCloud } from './TilePointCloud';
-import VideoGlobe from './VideoGlobe';
+// import { TileLayer } from './TileLayer';
+// import { TilePointCloud } from './TilePointCloud';
+// import VideoGlobe from './VideoGlobe';
 import { markers } from '../data/markers';
 import { Marker } from './Marker';
 
+/** Default radius for the globe sphere geometry - centralized control point */
+export const DEFAULT_GLOBE_RADIUS = 1;
+
 // Both the Earth and its wrapper use the same radius value for accurate alignment between cursor interaction and globe surface
-const EARTH_RADIUS = DEFAULT_GLOBE_RADIUS;
+const EARTH_RADIUS = 1;
 
 function Scene() {
   const { rotationSpeed } = useControls({
@@ -34,23 +37,23 @@ function Scene() {
         <Earth radius={EARTH_RADIUS} />
 
         {/* Tile layer */}
-        <TileLayer
+        {/* <TileLayer
           zoom={3}
           opacity={0.8}
           radius={EARTH_RADIUS + 0.001} // Slightly above the globe surface
-        />
+        /> */}
 
         {/* Point cloud visualization of tiles */}
-        <TilePointCloud
+        {/* <TilePointCloud
           zoom={2}
-          radius={EARTH_RADIUS + 0.001} // Slightly above the globe surface
-        />
+          radius={EARTH_RADIUS + 0.002} // Slightly above the globe surface
+        /> */}
 
-        <VideoGlobe radius={EARTH_RADIUS} />
+        {/* <VideoGlobe radius={EARTH_RADIUS} /> */}
 
         {/* Markers for major cities */}
         {markers.map((m) => (
-          <Marker key={m.id} {...m} />
+          <Marker key={m.id} {...m} globeRadius={EARTH_RADIUS} />
         ))}
       </GlobeWrapper>
 
@@ -59,8 +62,8 @@ function Scene() {
         enablePan={true}
         enableZoom={true}
         enableRotate={false}
-        minDistance={1.2}
-        maxDistance={8}
+        minDistance={EARTH_RADIUS * 1.2} // Prevents zooming too close to the globe
+        maxDistance={EARTH_RADIUS * 3}
       />
 
       {/* Performance stats */}
