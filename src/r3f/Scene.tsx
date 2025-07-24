@@ -1,4 +1,5 @@
 import { OrbitControls, Stats } from '@react-three/drei';
+import { useControls } from 'leva';
 
 import GlobeWrapper, { DEFAULT_GLOBE_RADIUS } from './GlobeWrapper';
 import Earth from './Earth';
@@ -12,6 +13,10 @@ import { Marker } from './Marker';
 const EARTH_RADIUS = DEFAULT_GLOBE_RADIUS;
 
 function Scene() {
+  const { rotationSpeed } = useControls({
+    rotationSpeed: { value: 0.005, min: 0, max: 0.1, step: 0.001 },
+    wireframe: false
+  });
   return (
     <>
       {/* Ambient light for overall illumination */}
@@ -21,7 +26,7 @@ function Scene() {
       <directionalLight position={[-10, 10, 15]} intensity={5} />
 
       <GlobeWrapper
-        autoRotationSpeed={0} // 0 = auto-rotation off
+        autoRotationSpeed={rotationSpeed}
         radius={EARTH_RADIUS}
         debug={true}
       >

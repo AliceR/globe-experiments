@@ -1,12 +1,7 @@
-import { useControls } from 'leva';
 import { useTexture } from '@react-three/drei';
 import { DEFAULT_GLOBE_RADIUS } from './GlobeWrapper';
 
 function Earth({ radius = DEFAULT_GLOBE_RADIUS }: { radius?: number }) {
-  const { wireframe } = useControls({
-    rotationSpeed: { value: 0.01, min: 0, max: 0.1, step: 0.001 },
-    wireframe: false
-  });
   const [colorMap, bumpMap] = useTexture([
     '/textures/world.topo.bathy.200407.3x5400x2700.png',
     '/textures/world.topo.bathy.200407.3x5400x2700.png'
@@ -15,12 +10,7 @@ function Earth({ radius = DEFAULT_GLOBE_RADIUS }: { radius?: number }) {
   return (
     <mesh rotation={[0, 0, 0]}>
       <sphereGeometry args={[radius, 64, 64]} />
-      <meshStandardMaterial
-        map={colorMap}
-        bumpMap={bumpMap}
-        bumpScale={0.5}
-        wireframe={wireframe}
-      />
+      <meshStandardMaterial map={colorMap} bumpMap={bumpMap} bumpScale={0.5} />
     </mesh>
   );
 }

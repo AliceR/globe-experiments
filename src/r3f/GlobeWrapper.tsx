@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import type { ThreeEvent } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -81,6 +81,9 @@ function GlobeWrapper({
   const [autoRotationSpeed, setAutoRotationSpeed] = useState(
     initialAutoRotationSpeed
   );
+  useEffect(() => {
+    setAutoRotationSpeed(initialAutoRotationSpeed);
+  }, [initialAutoRotationSpeed]);
 
   /** Initial quaternion state when drag began, used for relative rotation calculations */
   const [initialQuaternion, setInitialQuaternion] =
