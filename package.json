@@ -14,6 +14,9 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@deck.gl/geo-layers": "^9.1.13",
+    "@deck.gl/layers": "^9.1.13",
+    "@deck.gl/react": "^9.1.13",
     "@react-three/drei": "^10.5.0",
     "@react-three/fiber": "^9.2.0",
     "@tailwindcss/vite": "^4.1.11",
