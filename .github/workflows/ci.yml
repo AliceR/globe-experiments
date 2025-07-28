@@ -9,6 +9,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [22]
 
     steps:
       - uses: actions/checkout@v4
@@ -16,11 +19,29 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: ${{ matrix.node-version }}
           cache: 'npm'
 
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: cache-node-modules
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ matrix.node-version }}-node-modules-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
       - name: Install dependencies
-        run: npm ci
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
+        run: |
+          # Use npm ci with --include=optional to handle platform-specific binaries
+          npm ci --include=optional
+
+      - name: Verify installation
+        run: |
+          # Quick verification that problematic packages work
+          npx rollup --version
+          node -e "console.log('LightningCSS check:', !!require('lightningcss'))" || echo "LightningCSS not available"
 
       - name: Run linter (includes formatting)
         run: npm run lint
