@@ -6,6 +6,7 @@ import tseslint from 'typescript-eslint';
 import { globalIgnores } from 'eslint/config';
 import prettier from 'eslint-config-prettier';
 import prettierPlugin from 'eslint-plugin-prettier';
+import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
 
 export default tseslint.config([
   globalIgnores(['dist']),
@@ -16,6 +17,7 @@ export default tseslint.config([
       ...tseslint.configs.recommendedTypeChecked,
       reactHooks.configs['recommended-latest'],
       reactRefresh.configs.vite,
+      jsxA11yPlugin.flatConfigs.recommended,
       prettier
     ],
     plugins: {
