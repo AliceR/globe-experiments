@@ -24,7 +24,7 @@ import { SphereGeometry } from '@luma.gl/engine';
 import type { GlobeViewState, LayerProps, PickingInfo } from '@deck.gl/core';
 import { DeckGLGlobeContext } from './contexts/GlobeContext';
 import { DeckGLGlobeProvider } from './contexts/GlobeProvider';
-import { RotationControlButton } from './RotationControlButton';
+import { RotationControlButton } from '../components/RotationControlButton';
 import { markers } from '../data/markers';
 import { getTileUrl } from '../r3f/utils/tiles';
 
@@ -300,7 +300,10 @@ function DeckGLGlobeInner() {
           return null;
         }}
       />
-      <RotationControlButton />
+      <RotationControlButton
+        rotationState={rotationState}
+        setRotationState={setRotationState}
+      />
     </>
   );
 }

@@ -1,8 +1,7 @@
 import R3FGlobe from './r3f';
 import DeckGLGlobe from './deckgl';
 
-import { Tabs } from './tabs/Tabs';
-import { useTabWithUrl } from './tabs/useTabsWithUrl';
+import { Tabs, useTabWithUrl } from './components/tabs';
 
 const TABS = [
   { key: 'r3f', label: 'R3F Globe' },

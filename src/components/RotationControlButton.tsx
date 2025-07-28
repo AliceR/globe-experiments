@@ -1,9 +1,10 @@
-import { useContext } from 'react';
-import { DeckGLGlobeContext } from './contexts/GlobeContext';
-
-export function RotationControlButton() {
-  const { rotationState, setRotationState } = useContext(DeckGLGlobeContext);
-
+export function RotationControlButton({
+  rotationState,
+  setRotationState
+}: {
+  rotationState: 'rotating' | 'paused' | 'stopped';
+  setRotationState: (state: 'rotating' | 'paused' | 'stopped') => void;
+}) {
   const toggleRotation = () => {
     if (rotationState === 'rotating') {
       setRotationState('stopped');
@@ -23,7 +24,7 @@ export function RotationControlButton() {
     <button
       onClick={toggleRotation}
       onMouseUp={(e) => e.currentTarget.blur()}
-      className='absolute bottom-5 left-1/2 z-[100] -translate-x-1/2 rounded-lg border border-transparent bg-black px-3 py-2 text-white transition-all duration-200 ease-in-out hover:-translate-y-0.5 hover:scale-110 hover:border-blue-300'
+      className='absolute bottom-5 left-1/2 z-[100] -translate-x-1/2 rounded-lg border border-transparent px-3 py-2 text-white transition-all duration-200 ease-in-out hover:-translate-y-0.5 hover:scale-110 hover:border-blue-300'
       aria-label={buttonLabel}
       title={buttonLabel}
     >
