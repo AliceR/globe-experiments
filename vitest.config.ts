@@ -7,7 +7,10 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: './src/test/setup.ts',
-    css: true
+    setupFiles: ['./src/test/setup.ts', './src/test/mocks.tsx'],
+    css: true,
+    env: {
+      NODE_ENV: 'test'
+    }
   }
 });
