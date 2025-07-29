@@ -1,17 +1,19 @@
-# Earth Information Explorer
+# Globe Experiments
 
-🌍 Interactive 3D geospatial dashboard with dynamic data visualization.
+🌍 Interactive 3D globe comparing DeckGL and React Three Fiber (R3F) implementations.
 
 ## Features
 
+- **3D Library Comparison**: Side-by-side comparison of DeckGL and R3F globe rendering with tabbed interface
 - **Interactive 3D Scene**: Mouse controls for rotation, zoom, and pan
-- **Real-time Controls**: Leva panel for adjusting scene parameters
-- **Performance Monitoring**: Built-in stats display
+- **Globe Animation**: Automatic rotation around polar axis with pause/resume controls
+- **Interactive Markers**: Clickable location markers on the globe surface
+- **Data Visualization**: Tile layer overlays with VEDA geospatial data (<https://openveda.cloud/>)
 - **Responsive Design**: Full-screen 3D canvas with overlay UI
 
 ## Development Setup
 
-This project uses Vite + React + TypeScript with Three.js for 3D visualization.
+This project uses Vite + React + TypeScript.
 
 ### Available Scripts
 
@@ -36,11 +38,17 @@ ESLint is configured with Prettier integration, Stylelint for CSS, and TypeScrip
 
 ### 3D Libraries
 
+**React Three Fiber (R3F) Implementation:**
+
 - **Three.js**: Core 3D graphics library
 - **@react-three/fiber**: React renderer for Three.js
 - **@react-three/drei**: Helper components and utilities
 - **Leva**: Real-time controls for development and debugging
 
+**DeckGL Implementation:**
+
+- **DeckGL**: High-performance WebGL-based geospatial data visualization framework
+
 ---
 
-*Built with React + TypeScript + Vite* <!-- markdownlint-disable-line MD036 -->
+*Built with React + TypeScript + Vite and AI assistance* <!-- markdownlint-disable-line MD036 -->
