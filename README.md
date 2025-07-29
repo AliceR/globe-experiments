@@ -32,6 +32,7 @@ ESLint is configured with Prettier integration, Stylelint for CSS, and TypeScrip
 - **Prettier integration**: Formatting rules are enforced as ESLint errors
 - **Git hooks**: Pre-commit runs linting (`npm run lint`), pre-push runs tests (`npm run test:run`)
 - **Auto-fix**: `npm run lint:fix` fixes both linting and formatting issues
+- **Accessibility testing**: Axe-core automatically logs accessibility violations in development mode browser console
 
 ### 3D Libraries
 
