@@ -9,17 +9,18 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [22]
 
     steps:
       - uses: actions/checkout@v4
 
+      - name: Read .nvmrc
+        run: echo ::set-output name=NVMRC::$(cat .nvmrc)
+        id: nvm
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: ${{ steps.nvm.outputs.NVMRC }}
           cache: 'npm'
 
       - name: Cache node_modules
@@ -27,7 +28,7 @@ jobs:
         id: cache-node-modules
         with:
           path: node_modules
-          key: ${{ runner.os }}-node-${{ matrix.node-version }}-node-modules-${{ hashFiles('package-lock.json') }}
+          key: ${{ runner.os }}-node-${{ steps.nvm.outputs.NVMRC }}-node-modules-${{ hashFiles('package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-modules-
 
