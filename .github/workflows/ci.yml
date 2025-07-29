@@ -38,6 +38,11 @@ jobs:
           # Use npm ci with --include=optional to handle platform-specific binaries
           npm ci --include=optional
 
+      - name: Fix optional dependencies (npm bug workaround)
+        run: |
+          # Fix npm optional dependencies bug for all platform-specific binaries
+          npm install --include=optional --no-save @rollup/rollup-linux-x64-gnu lightningcss-linux-x64-gnu @tailwindcss/oxide-linux-x64-gnu
+
       - name: Verify installation
         run: |
           # Quick verification that problematic packages work
