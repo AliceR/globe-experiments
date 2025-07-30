@@ -3,6 +3,12 @@ import type { GlobeViewState } from '@deck.gl/core';
 
 export type RotationState = 'rotating' | 'paused' | 'stopped';
 
+export const INITIAL_VIEW_STATE: GlobeViewState = {
+  longitude: -70,
+  latitude: 20,
+  zoom: 2
+};
+
 interface DeckGLGlobeContextType {
   rotationState: RotationState;
   setRotationState: (state: RotationState) => void;
@@ -15,7 +21,7 @@ interface DeckGLGlobeContextType {
 export const DeckGLGlobeContext = createContext<DeckGLGlobeContextType>({
   rotationState: 'rotating',
   setRotationState: () => {},
-  viewState: { longitude: 0, latitude: 20, zoom: 2 },
+  viewState: INITIAL_VIEW_STATE,
   setViewState: () => {},
   isInteracting: false,
   setIsInteracting: () => {}

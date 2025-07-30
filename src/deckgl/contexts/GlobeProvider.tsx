@@ -1,12 +1,10 @@
 import React, { useState, useCallback, type ReactNode } from 'react';
 import type { GlobeViewState } from '@deck.gl/core';
-import { DeckGLGlobeContext, type RotationState } from './GlobeContext';
-
-const INITIAL_VIEW_STATE: GlobeViewState = {
-  longitude: 0,
-  latitude: 20,
-  zoom: 2
-};
+import {
+  DeckGLGlobeContext,
+  INITIAL_VIEW_STATE,
+  type RotationState
+} from './GlobeContext';
 
 export const DeckGLGlobeProvider: React.FC<{ children: ReactNode }> = ({
   children

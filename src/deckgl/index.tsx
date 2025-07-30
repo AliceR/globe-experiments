@@ -8,47 +8,16 @@ import {
 } from 'react';
 
 import { DeckGL } from '@deck.gl/react';
-import {
-  COORDINATE_SYSTEM,
-  _GlobeView as GlobeView,
-  LightingEffect,
-  AmbientLight,
-  _SunLight as SunLight
-} from '@deck.gl/core';
-import { GeoJsonLayer, ScatterplotLayer } from '@deck.gl/layers';
-import { SimpleMeshLayer } from '@deck.gl/mesh-layers';
-import { TileLayer } from '@deck.gl/geo-layers';
-import { BitmapLayer } from '@deck.gl/layers';
-import { SphereGeometry } from '@luma.gl/engine';
+import { _GlobeView as GlobeView } from '@deck.gl/core';
 
-import type { GlobeViewState, LayerProps, PickingInfo } from '@deck.gl/core';
+import type { GlobeViewState, PickingInfo } from '@deck.gl/core';
 import { DeckGLGlobeContext } from './contexts/GlobeContext';
 import { DeckGLGlobeProvider } from './contexts/GlobeProvider';
 import { RotationControlButton } from '../components/RotationControlButton';
-import { markers } from '../data/markers';
-import { getTileUrl } from '../r3f/utils/tiles';
-
-// Type definitions for our data
-interface MarkerData {
-  id: string;
-  name: string;
-  lat: number;
-  lon: number;
-}
-
-const EARTH_RADIUS_METERS = 6.3e6;
-
-const ambientLight = new AmbientLight({
-  color: [255, 255, 255],
-  intensity: 0.5
-});
-const sunLight = new SunLight({
-  color: [255, 255, 255],
-  intensity: 2.0,
-  timestamp: 0
-});
-// create lighting effect with light sources
-const lightingEffect = new LightingEffect({ ambientLight, sunLight });
+import { backgroundLayers, dataLayers } from './layers';
+import { lightingEffect } from './lighting';
+import type { MarkerData } from './types';
+import { getTooltip } from './tooltip';
 
 function DeckGLGlobeInner() {
   const {
@@ -75,7 +44,7 @@ function DeckGLGlobeInner() {
           // ~60fps
           setViewState({
             ...viewState,
-            longitude: (viewState.longitude + 0.1) % 360
+            longitude: (viewState.longitude - 0.3) % 360
           });
           lastTimeRef.current = time;
         }
@@ -155,112 +124,11 @@ function DeckGLGlobeInner() {
     [rotationState, setRotationState, setIsInteracting]
   );
 
-  const backgroundLayers = useMemo(
-    () => [
-      new SimpleMeshLayer({
-        id: 'earth-sphere',
-        data: [0],
-        mesh: new SphereGeometry({
-          radius: EARTH_RADIUS_METERS,
-          nlat: 18,
-          nlong: 36
-        }),
-        coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-        getPosition: [0, 0, 0],
-        getColor: [255, 255, 255]
-      }),
+  const memoizedBackgroundLayers = useMemo(() => backgroundLayers, []);
 
-      // Earth coastline layer
-      new GeoJsonLayer({
-        id: 'coastline',
-        data: 'https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_coastline.geojson',
-        // Styles
-        stroked: true,
-        filled: false,
-        opacity: 1.0,
-        getLineColor: [30, 80, 120, 255],
-        getLineWidth: 1,
-        lineWidthUnits: 'pixels',
-        lineWidthMinPixels: 1,
-        lineWidthMaxPixels: 3
-      })
-    ],
-    []
-  );
-
-  const dataLayers = useMemo(
-    () => [
-      // Tile layer with VEDA data
-      new TileLayer({
-        id: 'veda-tile-layer',
-        getTileData: ({
-          index
-        }: {
-          index: { x: number; y: number; z: number };
-        }) => {
-          const { x, y, z } = index;
-          const url = getTileUrl(x, y, z);
-          return fetch(url)
-            .then((response) => response.blob())
-            .then((blob) => {
-              return new Promise<HTMLImageElement>((resolve) => {
-                const img = new Image();
-                img.onload = () => resolve(img);
-                img.src = URL.createObjectURL(blob);
-              });
-            });
-        },
-        maxZoom: 4,
-        minZoom: 0,
-        tileSize: 256,
-        renderSubLayers: (
-          props: LayerProps & {
-            tile: { boundingBox: [number[], number[]] };
-            data: HTMLImageElement;
-          }
-        ) => {
-          const { tile, data } = props;
-          const { boundingBox } = tile;
-          return new BitmapLayer({
-            ...props,
-            data: undefined,
-            image: data,
-            bounds: [
-              boundingBox[0][0], // west
-              boundingBox[0][1], // south
-              boundingBox[1][0], // east
-              boundingBox[1][1] // north
-            ]
-          });
-        }
-      }),
-
-      // Markers layer
-      new ScatterplotLayer({
-        id: 'markers-layer',
-        data: markers,
-        getPosition: (marker: MarkerData) => [marker.lon, marker.lat, 0],
-        getRadius: 50000, // radius in meters
-        getFillColor: [255, 100, 100, 200],
-        getLineColor: [255, 255, 255],
-        getLineWidth: 10000,
-        radiusMinPixels: 5,
-        radiusMaxPixels: 15,
-        lineWidthMinPixels: 1,
-        lineWidthMaxPixels: 3,
-        stroked: true,
-        filled: true,
-        pickable: true,
-        onClick: handleMarkerClick,
-        onHover: (info) => {
-          setIsMarkerHovered(!!info.object);
-        },
-        updateTriggers: {
-          getRadius: rotationState // Re-render when rotation state changes for hover effects
-        }
-      })
-    ],
-    [handleMarkerClick, rotationState]
+  const memoizedDataLayers = useMemo(
+    () => dataLayers(handleMarkerClick, rotationState, setIsMarkerHovered),
+    [handleMarkerClick, rotationState, setIsMarkerHovered]
   );
 
   return (
@@ -272,33 +140,11 @@ function DeckGLGlobeInner() {
         onInteractionStateChange={handleInteractionStateChange}
         controller={true}
         effects={[lightingEffect]}
-        layers={[...backgroundLayers, ...dataLayers]}
-        getCursor={({ isHovering }) => {
-          if (isMarkerHovered) {
-            return 'pointer';
-          }
-          return isHovering ? 'grab' : 'default';
-        }}
-        getTooltip={(info) => {
-          const { object, layer } = info as {
-            object: MarkerData | null;
-            layer: { id: string } | null;
-          };
-          if (layer?.id === 'markers-layer' && object) {
-            return {
-              html: `<div style="background: rgba(0,0,0,0.8); color: white; padding: 8px; border-radius: 4px;">
-                <strong>${object.name}</strong><br/>
-                Lat: ${object.lat.toFixed(4)}<br/>
-                Lon: ${object.lon.toFixed(4)}
-              </div>`,
-              style: {
-                fontSize: '12px',
-                pointerEvents: 'none'
-              }
-            };
-          }
-          return null;
-        }}
+        layers={[...memoizedBackgroundLayers, ...memoizedDataLayers]}
+        getCursor={({ isDragging }) =>
+          isMarkerHovered ? 'pointer' : isDragging ? 'grabbing' : 'grab'
+        }
+        getTooltip={getTooltip('markers-layer')}
       />
       <RotationControlButton
         rotationState={rotationState}
