@@ -17,13 +17,13 @@ This project uses Vite + React + TypeScript.
 
 ### Available Scripts
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run lint` - Run ESLint + Stylelint (includes Prettier formatting checks)
-- `npm run lint:fix` - Auto-fix ESLint + Stylelint and Prettier issues
-- `npm run test` - Run tests in watch mode
-- `npm run test:run` - Run tests once
-- `npm run check` - Run both linting and formatting checks
+- `pnpm run dev` - Start development server
+- `pnpm run build` - Build for production
+- `pnpm run lint` - Run ESLint + Stylelint (includes Prettier formatting checks)
+- `pnpm run lint:fix` - Auto-fix ESLint + Stylelint and Prettier issues
+- `pnpm run test` - Run tests in watch mode
+- `pnpm run test:run` - Run tests once
+- `pnpm run check` - Run both linting and formatting checks
 
 ### Code Quality
 
@@ -32,8 +32,8 @@ ESLint is configured with Prettier integration, Stylelint for CSS, and TypeScrip
 - **Type-aware linting**: Catches TypeScript-specific issues and type errors
 - **CSS linting**: Stylelint catches CSS syntax errors and enforces best practices
 - **Prettier integration**: Formatting rules are enforced as ESLint errors
-- **Git hooks**: Pre-commit runs linting (`npm run lint`), pre-push runs tests (`npm run test:run`)
-- **Auto-fix**: `npm run lint:fix` fixes both linting and formatting issues
+- **Git hooks**: Pre-commit runs linting (`pnpm run lint`), pre-push runs tests (`pnpm run test:run`)
+- **Auto-fix**: `pnpm run lint:fix` fixes both linting and formatting issues
 - **Accessibility testing**: Axe-core automatically logs accessibility violations in development mode browser console
 
 ### 3D Libraries
