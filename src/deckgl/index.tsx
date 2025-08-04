@@ -31,6 +31,7 @@ function DeckGLGlobeInner() {
 
   const animationRef = useRef<number | undefined>(undefined);
   const lastTimeRef = useRef<number>(0);
+  const pausedTimeoutRef = useRef<number>(0);
 
   // Track if a marker is hovered
   const [isMarkerHovered, setIsMarkerHovered] = useState(false);
@@ -60,13 +61,32 @@ function DeckGLGlobeInner() {
     };
   }, [rotationState, isInteracting, viewState, setViewState]);
 
-  // Pause rotation when marker is hovered, resume when not hovered
   useEffect(() => {
-    if (isMarkerHovered && rotationState === 'rotating') {
-      setRotationState('paused');
-    } else if (!isMarkerHovered && rotationState === 'paused') {
-      setRotationState('rotating');
+    // Pause rotation when marker is hovered, resume after 1s when not hovered
+    if (isMarkerHovered) {
+      if (rotationState === 'rotating') {
+        setRotationState('paused');
+      }
+      // Clear any pending resume timeout if hovering again
+      if (pausedTimeoutRef.current) {
+        clearTimeout(pausedTimeoutRef.current);
+        pausedTimeoutRef.current = 0;
+      }
+    } else {
+      if (rotationState === 'paused' && !pausedTimeoutRef.current) {
+        pausedTimeoutRef.current = setTimeout(() => {
+          setRotationState('rotating');
+          pausedTimeoutRef.current = 0;
+        }, 1000) as unknown as number;
+      }
     }
+
+    return () => {
+      if (pausedTimeoutRef.current) {
+        clearTimeout(pausedTimeoutRef.current);
+        pausedTimeoutRef.current = 0;
+      }
+    };
   }, [isMarkerHovered, rotationState, setRotationState]);
 
   // Handle marker click to focus on location
