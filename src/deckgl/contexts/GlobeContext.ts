@@ -19,7 +19,7 @@ interface DeckGLGlobeContextType {
 }
 
 export const DeckGLGlobeContext = createContext<DeckGLGlobeContextType>({
-  rotationState: 'rotating',
+  rotationState: 'stopped',
   setRotationState: () => {},
   viewState: INITIAL_VIEW_STATE,
   setViewState: () => {},

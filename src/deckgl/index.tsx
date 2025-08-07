@@ -14,7 +14,15 @@ import type { GlobeViewState, PickingInfo } from '@deck.gl/core';
 import { DeckGLGlobeContext } from './contexts/GlobeContext';
 import { DeckGLGlobeProvider } from './contexts/GlobeProvider';
 import { RotationControlButton } from '../components/RotationControlButton';
-import { backgroundLayers, dataLayers } from './layers';
+import { DeckGlobeOverlayLayerSelector } from './DeckGlobeOverlayLayerSelector';
+import {
+  backgroundLayers,
+  dataLayers,
+  markerLayers,
+  type VedaTileLayer
+} from './layers';
+import { fetchVedaLayers, getVedaLayerTileUrl } from '../data/fetchVedaLayers';
+import type { VedaLayer } from '../data/fetchVedaLayers';
 import { lightingEffect } from './lighting';
 import type { MarkerData } from './types';
 import { getTooltip } from './tooltip';
@@ -35,6 +43,23 @@ function DeckGLGlobeInner() {
 
   // Track if a marker is hovered
   const [isMarkerHovered, setIsMarkerHovered] = useState(false);
+
+  // VEDA layer selection state
+  const [selectedLayerIds, setSelectedLayerIds] = useState<string[]>([]);
+  const [allVedaCollections, setAllVedaCollections] = useState<VedaLayer[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [vedaError, setVedaError] = useState<string | null>(null);
+
+  // Fetch all VEDA layers on mount
+  useEffect(() => {
+    fetchVedaLayers()
+      .then((layers) => {
+        setAllVedaCollections(layers);
+      })
+      .catch((err) => {
+        setVedaError(err instanceof Error ? err.message : String(err));
+      });
+  }, []);
 
   // Auto-rotation logic
   useEffect(() => {
@@ -146,13 +171,58 @@ function DeckGLGlobeInner() {
 
   const memoizedBackgroundLayers = useMemo(() => backgroundLayers, []);
 
+  // Store selected VEDA tile layers in state
+  const [selectedTileLayers, setSelectedTileLayers] = useState<VedaTileLayer[]>(
+    []
+  );
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchTileLayers = async () => {
+      const layers = await Promise.all(
+        selectedLayerIds.map(async (id) => {
+          const layer = allVedaCollections.find((l) => l.id === id);
+          if (layer) {
+            console.log(layer);
+            const urlFunc = await getVedaLayerTileUrl(layer.id, layer.renders);
+            console.log(urlFunc);
+            return {
+              ...layer,
+              getUrl: urlFunc
+            } as unknown as VedaTileLayer;
+          }
+          return undefined;
+        })
+      );
+      if (isMounted) {
+        setSelectedTileLayers(
+          layers.filter((x): x is NonNullable<typeof x> => x !== undefined)
+        );
+      }
+    };
+    void fetchTileLayers();
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedLayerIds, allVedaCollections]);
+
   const memoizedDataLayers = useMemo(
-    () => dataLayers(handleMarkerClick, rotationState, setIsMarkerHovered),
+    () => dataLayers(selectedTileLayers),
+    [selectedTileLayers]
+  );
+
+  const memoizedMarkerLayers = useMemo(
+    () => markerLayers(handleMarkerClick, rotationState, setIsMarkerHovered),
     [handleMarkerClick, rotationState, setIsMarkerHovered]
   );
 
   return (
     <>
+      <DeckGlobeOverlayLayerSelector
+        value={selectedLayerIds}
+        onChange={setSelectedLayerIds}
+        layers={allVedaCollections}
+      />
       <DeckGL
         views={new GlobeView()}
         viewState={viewState}
@@ -160,7 +230,11 @@ function DeckGLGlobeInner() {
         onInteractionStateChange={handleInteractionStateChange}
         controller={true}
         effects={[lightingEffect]}
-        layers={[...memoizedBackgroundLayers, ...memoizedDataLayers]}
+        layers={[
+          ...memoizedBackgroundLayers,
+          ...memoizedDataLayers,
+          ...memoizedMarkerLayers
+        ]}
         getCursor={({ isDragging }) =>
           isMarkerHovered ? 'pointer' : isDragging ? 'grabbing' : 'grab'
         }

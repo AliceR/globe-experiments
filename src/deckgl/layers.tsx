@@ -6,7 +6,14 @@ import { BitmapLayer } from '@deck.gl/layers';
 import { SphereGeometry } from '@luma.gl/engine';
 
 import { markers } from '../data/markers';
-import { getTileUrl } from '../r3f/utils/tiles';
+
+// Type for a VEDA tile layer (STAC collection with getUrl method)
+export interface VedaTileLayer {
+  id: string;
+  title: string;
+  description?: string;
+  getUrl: (z: number, x: number, y: number) => string;
+}
 
 import type {
   DataLayersProps,
@@ -47,47 +54,54 @@ export const backgroundLayers = [
   })
 ];
 
+// selectedLayers: array of VedaTileLayer
 export const dataLayers = (
+  selectedLayers: VedaTileLayer[] = []
+): TileLayer[] => {
+  console.log('Selected VEDA layers:', selectedLayers);
+  return selectedLayers.map(
+    (layer) =>
+      new TileLayer({
+        id: layer.id,
+        getTileData: ({ index }: TileLayerProps) => {
+          const { x, y, z } = index;
+          const tileUrl = layer.getUrl(z, x, y);
+          return fetch(tileUrl)
+            .then((response) => response.blob())
+            .then((blob) => {
+              return new Promise<HTMLImageElement>((resolve) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.src = URL.createObjectURL(blob);
+              });
+            });
+        },
+        maxZoom: 4,
+        minZoom: 0,
+        tileSize: 256,
+        renderSubLayers: (props: RenderSubLayersProps) => {
+          const { tile, data } = props;
+          const { boundingBox } = tile;
+          return new BitmapLayer({
+            ...props,
+            data: undefined,
+            image: data,
+            bounds: [
+              boundingBox[0][0], // west
+              boundingBox[0][1], // south
+              boundingBox[1][0], // east
+              boundingBox[1][1] // north
+            ]
+          });
+        }
+      })
+  );
+};
+export const markerLayers = (
   handleMarkerClick: DataLayersProps['handleMarkerClick'],
   rotationState: DataLayersProps['rotationState'],
   setIsMarkerHovered: DataLayersProps['setIsMarkerHovered']
 ) => [
-  // Tile layer with VEDA data
-  new TileLayer({
-    id: 'veda-tile-layer',
-    getTileData: ({ index }: TileLayerProps) => {
-      const { x, y, z } = index;
-      const url = getTileUrl(x, y, z);
-      return fetch(url)
-        .then((response) => response.blob())
-        .then((blob) => {
-          return new Promise<HTMLImageElement>((resolve) => {
-            const img = new Image();
-            img.onload = () => resolve(img);
-            img.src = URL.createObjectURL(blob);
-          });
-        });
-    },
-    maxZoom: 4,
-    minZoom: 0,
-    tileSize: 256,
-    renderSubLayers: (props: RenderSubLayersProps) => {
-      const { tile, data } = props;
-      const { boundingBox } = tile;
-      return new BitmapLayer({
-        ...props,
-        data: undefined,
-        image: data,
-        bounds: [
-          boundingBox[0][0], // west
-          boundingBox[0][1], // south
-          boundingBox[1][0], // east
-          boundingBox[1][1] // north
-        ]
-      });
-    }
-  }),
-
   // Markers layer
   new ScatterplotLayer({
     id: 'markers-layer',

@@ -9,7 +9,7 @@ import {
 export const DeckGLGlobeProvider: React.FC<{ children: ReactNode }> = ({
   children
 }) => {
-  const [rotationState, setRotationState] = useState<RotationState>('rotating');
+  const [rotationState, setRotationState] = useState<RotationState>('stopped');
   const [viewState, setViewState] =
     useState<GlobeViewState>(INITIAL_VIEW_STATE);
   const [isInteracting, setIsInteracting] = useState(false);
